@@ -1,7 +1,7 @@
 // Catalog path resolution — shared by the WPF GUI and the Headless CLI.
 // The catalog (sheet_definitions/, palette_definitions/, spritesheets/) lives in the
 // LPC submodule repo at tools/lpc-sprite-generator/. When the binaries ship to
-// bins/lpc-sprite-generator-dotnet/{headless,wpf}/, the catalog is a SIBLING tree
+// build/lpc-sprite-generator/{headless,gui}/, the catalog is a SIBLING tree
 // (not an ancestor), so we have to look beyond pure ancestor walks.
 using System;
 using System.Collections.Generic;

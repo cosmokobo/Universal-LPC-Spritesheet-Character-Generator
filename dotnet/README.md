@@ -55,7 +55,7 @@ dotnet publish src/LpcSpriteGen.Headless/LpcSpriteGen.Headless.csproj /p:Publish
 dotnet publish src/LpcSpriteGen.Wpf/LpcSpriteGen.Wpf.csproj /p:PublishProfile=win-x64.pubxml
 ```
 
-Output lands in `<workspace>/bins/lpc-sprite-generator-dotnet/{headless,wpf}/`.
+Output lands in `<workspace>/build/lpc-sprite-generator/{headless,gui}/`.
 
 ## Headless CLI (for AI agents / scripting)
 

@@ -1,6 +1,6 @@
 @echo off
 REM Build single-file Windows binaries for the C# port of LPC Sprite Generator.
-REM Output: bins/lpc-sprite-generator-dotnet/{headless,wpf}/
+REM Output: build/lpc-sprite-generator/{headless,gui}/
 REM
 REM Run from anywhere — it locates the dotnet/ solution relative to its own path.
 setlocal
@@ -33,5 +33,5 @@ if errorlevel 1 (
 )
 
 echo.
-echo === Done. Binaries in bins/lpc-sprite-generator-dotnet/ ===
+echo === Done. Binaries in build/lpc-sprite-generator/ ===
 endlocal

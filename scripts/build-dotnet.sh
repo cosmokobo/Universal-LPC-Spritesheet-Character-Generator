@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build single-file Windows binaries for the C# port of LPC Sprite Generator.
-# Output: bins/lpc-sprite-generator-dotnet/{headless,wpf}/
+# Output: build/lpc-sprite-generator/{headless,gui}/
 #
 # Run from anywhere — it locates the dotnet/ solution relative to its own path.
 set -euo pipefail
@@ -22,4 +22,4 @@ dotnet publish "$SCRIPT_DIR/../dotnet/src/LpcSpriteGen.Wpf/LpcSpriteGen.Wpf.cspr
     /p:PublishProfile=win-x64.pubxml
 
 echo
-echo "=== Done. Binaries in bins/lpc-sprite-generator-dotnet/ ==="
+echo "=== Done. Binaries in build/lpc-sprite-generator/ ==="
