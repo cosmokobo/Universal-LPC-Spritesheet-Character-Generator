@@ -1,7 +1,10 @@
 "use strict";
 
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 const { createTestemViteMiddleware } = require("vite-plugin-testem");
+
+const coverageEnabled = process.env.VITE_COVERAGE === "true";
 
 // Suppress app debug logs during tests by default (?debug=false), so localhost does not
 // enable window.DEBUG via getDebugParam(). Set DEBUG=true or DEBUG=1 in the environment
@@ -37,8 +40,9 @@ let testemConfig = {
   browser_start_timeout: 30,
   src_files: [
     "tests/**/*.js",
-    "sources/**/*.js",
-    "vite.config.js",
+    "tests/**/*.ts",
+    "sources/**/*.ts",
+    "vite.config.ts",
     "tests_run.html",
   ],
   browser_args: {
@@ -56,13 +60,14 @@ let testemConfig = {
         "--disable-session-crashed-bubble",
       ],
       ci: [
-        // needed to run ci mode locally on MacOS ARM
-        process.env.CI ? null : "--use-gl=angle",
-
         "--headless",
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--disable-gpu",
+        // Software WebGL so palette-recolor WebGL parity/fallback tests run in CI
+        // (bare --disable-gpu often makes getContext("webgl") return null).
+        "--use-gl=angle",
+        "--use-angle=swiftshader-webgl",
+        "--enable-unsafe-swiftshader",
         "--disable-popup-blocking",
         "--mute-audio",
         "--remote-debugging-port=0",
@@ -73,7 +78,7 @@ let testemConfig = {
         "--disable-session-crashed-bubble",
         // Omit --user-data-dir: Testem already sets a per-run temp profile. A second flag breaks
         // Chrome on some setups (e.g. macOS), and /tmp is not valid on Windows.
-      ].filter(Boolean),
+      ],
     },
     Firefox: {
       dev: [],
@@ -110,12 +115,28 @@ module.exports = async function testemConfigFactory() {
     ...testemConfig,
     middleware: [middleware],
     on_exit(config, data, callback) {
-      if (!viteClose) {
-        return callback(null);
+      const done = (err) => {
+        if (!viteClose) {
+          return callback(err ?? null);
+        }
+        viteClose()
+          .then(() => callback(err ?? null))
+          .catch((closeErr) => callback(err ?? closeErr));
+      };
+
+      if (!coverageEnabled) {
+        return done(null);
       }
-      viteClose()
-        .then(() => callback(null))
-        .catch(callback);
+
+      const result = spawnSync(
+        process.execPath,
+        [path.join(__dirname, "scripts/coverage/merge-browser-coverage.js")],
+        { stdio: "inherit" },
+      );
+      if (result.status !== 0) {
+        return done(new Error("Failed to merge browser coverage reports"));
+      }
+      done(null);
     },
   };
 };

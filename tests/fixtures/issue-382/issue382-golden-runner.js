@@ -24,11 +24,12 @@ import {
 } from "../../../sources/state/zip.ts";
 import { resetState } from "../../../sources/state/hash.ts";
 import { state } from "../../../sources/state/state.ts";
+import { createCatalog } from "../../../sources/state/catalog.ts";
 import { importStateFromJSON } from "../../../sources/state/json.ts";
 import issue382ItemMetadata from "./issue-382-itemdata.js";
 import issue382Selections from "./issue-382-selections.js";
 import { createFakeJSZip, sortedZipKeys } from "../../helpers/fake-jszip.js";
-import { seedBrowserCatalogMergedOnDist } from "../../browser-catalog-fixture.js";
+import { seedCatalogWithGeneratedContext } from "../../browser-catalog-fixture.js";
 
 let fakeZip;
 
@@ -39,15 +40,19 @@ function setStatus(text) {
 }
 
 async function runGoldens() {
+  const catalog = createCatalog();
   setStatus("Resetting state...");
   resetState();
   drawCalls.length = 0;
 
   setStatus("Seeding browser catalog...");
-  await seedBrowserCatalogMergedOnDist(issue382ItemMetadata);
+  seedCatalogWithGeneratedContext(catalog, issue382ItemMetadata);
 
   setStatus("Importing selections...");
-  Object.assign(state, importStateFromJSON(JSON.stringify(issue382Selections)));
+  Object.assign(
+    state,
+    importStateFromJSON(catalog, JSON.stringify(issue382Selections)),
+  );
 
   window.alert = () => {};
   if (typeof m !== "undefined" && m.redraw) {
@@ -79,27 +84,27 @@ async function runGoldens() {
   ctx.fillRect(0, 0, SHEET_WIDTH, SHEET_HEIGHT);
 
   setStatus("Rendering character...");
-  await renderCharacter(state.selections, state.bodyType);
+  await renderCharacter(catalog, state.selections, state.bodyType);
 
   const out = {};
 
   setStatus("Exporting split animations...");
-  await exportSplitAnimations();
+  await exportSplitAnimations(catalog);
   out.splitAnimations = sortedZipKeys(fakeZip);
   state.zipByAnimation.isRunning = false;
 
   setStatus("Exporting split item sheets...");
-  await exportSplitItemSheets();
+  await exportSplitItemSheets(catalog);
   out.splitItemSheets = sortedZipKeys(fakeZip);
   state.zipByItem.isRunning = false;
 
   setStatus("Exporting split item animations...");
-  await exportSplitItemAnimations();
+  await exportSplitItemAnimations(catalog);
   out.splitItemAnimations = sortedZipKeys(fakeZip);
   state.zipByAnimationAndItem.isRunning = false;
 
   setStatus("Exporting individual frames...");
-  await exportIndividualFrames();
+  await exportIndividualFrames(catalog);
   out.individualFrames = sortedZipKeys(fakeZip);
   if (state.zipIndividualFrames) {
     state.zipIndividualFrames.isRunning = false;

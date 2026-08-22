@@ -1,7 +1,7 @@
 /**
  * Indexed hash param resolution: same tie-breaking as legacy `Object.entries(itemMetadata)` scans
  * when `itemsByTypeName[typeName]` lists rows in `Object.keys(itemMetadata)` order (see
- * `buildMetadataIndexes` in `scripts/generateSources/state.js`).
+ * `buildMetadataIndexes` in `scripts/generateSources/state.ts`).
  *
  * `byTypeName` / `buildItemsByTypeNameLite` store only the fields used by
  * `resolveHashParamFromHashMatch` and `path.getNameWithoutVariant` (plus `itemId`); the full
@@ -48,8 +48,7 @@ export function expandMetadataIndexesWithInternedArrays(
     (rows) => Array.isArray(rows) && rows.length > 0,
   );
   const firstRow = firstType?.[0] as
-    | (SlimByTypeNameRow & { v?: number; r?: number })
-    | undefined;
+    (SlimByTypeNameRow & { v?: number; r?: number }) | undefined;
   if (
     !firstRow ||
     firstRow.variants !== undefined ||

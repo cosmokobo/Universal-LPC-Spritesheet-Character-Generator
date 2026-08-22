@@ -4,7 +4,7 @@ let loadedImages: Record<string, HTMLImageElement> = {};
 /** In-flight loads: same `src` shares one `Image` and one profiler span. */
 const inFlight = new Map<string, Promise<HTMLImageElement>>();
 
-/** Profiler is attached to `window.profiler` by `main.js`; absent in tests / Node. */
+/** Profiler is attached to `window.profiler` by `main.ts`; absent in tests / Node. */
 type WindowWithProfiler = Window & {
   profiler?: {
     mark: (name: string) => void;
@@ -89,14 +89,13 @@ export async function loadImagesInParallel<T>(
   getPath: (item: T) => string = (item) =>
     (item as { spritePath: string }).spritePath,
 ): Promise<LoadedImage<T>[]> {
-  const promises = items.map(
-    (item): Promise<LoadedImage<T>> =>
-      loadImage(getPath(item))
-        .then((img): LoadedImage<T> => ({ item, img, success: true }))
-        .catch(() => {
-          debugWarn(`Failed to load sprite: ${getPath(item)}`);
-          return { item, img: null, success: false };
-        }),
+  const promises = items.map((item): Promise<LoadedImage<T>> =>
+    loadImage(getPath(item))
+      .then((img): LoadedImage<T> => ({ item, img, success: true }))
+      .catch(() => {
+        debugWarn(`Failed to load sprite: ${getPath(item)}`);
+        return { item, img: null, success: false };
+      }),
   );
 
   return Promise.all(promises);

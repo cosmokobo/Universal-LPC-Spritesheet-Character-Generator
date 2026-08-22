@@ -1,12 +1,8 @@
 import { expect } from "chai";
 import { describe, it, beforeEach, afterEach } from "mocha-globals";
-import { resetCatalogForTests } from "../../sources/state/catalog.ts";
-import { getItemLite } from "../../sources/state/catalog.ts";
-import {
-  restoreAppCatalogAfterTest,
-  seedBrowserCatalog,
-} from "../browser-catalog-fixture.js";
-import { state } from "../../sources/state/state.ts";
+import { createCatalog } from "../../sources/state/catalog.ts";
+import { seedCatalog } from "../browser-catalog-fixture.js";
+import { configureStateCatalog, state } from "../../sources/state/state.ts";
 import {
   getMultiRecolors,
   getPaletteOptions,
@@ -15,12 +11,13 @@ import {
 describe("state/palettes.ts", () => {
   let previousSelections;
   let previousMatchBodyColorEnabled;
+  let catalog;
 
   beforeEach(() => {
     previousSelections = state.selections;
     previousMatchBodyColorEnabled = state.matchBodyColorEnabled;
     state.matchBodyColorEnabled = true;
-    resetCatalogForTests();
+    catalog = createCatalog();
 
     const paletteMetadata = {
       materials: {
@@ -273,14 +270,14 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    seedBrowserCatalog(testItemMetadata, { paletteMetadata });
+    seedCatalog(catalog, testItemMetadata, { paletteMetadata });
+    configureStateCatalog(catalog);
     state.selections = {};
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     state.selections = previousSelections;
     state.matchBodyColorEnabled = previousMatchBodyColorEnabled;
-    await restoreAppCatalogAfterTest();
   });
 
   it("falls back to a matching dotted recolor when the exact recolor is missing", () => {
@@ -292,6 +289,7 @@ describe("state/palettes.ts", () => {
     };
 
     const recolors = getMultiRecolors(
+      catalog,
       "torso_clothes_shortsleeve",
       state.selections,
     );
@@ -308,6 +306,7 @@ describe("state/palettes.ts", () => {
     };
 
     const recolors = getMultiRecolors(
+      catalog,
       "torso_clothes_shortsleeve",
       state.selections,
     );
@@ -324,8 +323,9 @@ describe("state/palettes.ts", () => {
     };
 
     const [paletteOptions, selectedColors] = getPaletteOptions(
+      catalog,
       "head_ears_elven",
-      getItemLite("head_ears_elven").unwrapOr(null),
+      catalog.getItemLite("head_ears_elven").unwrapOr(null),
     );
 
     expect(selectedColors).to.deep.equal({ ears: "bronze" });
@@ -341,8 +341,9 @@ describe("state/palettes.ts", () => {
 
   it("defaults source-backed recolors to source in getPaletteOptions", () => {
     const [paletteOptions, selectedColors] = getPaletteOptions(
+      catalog,
       "hair_long_tied_test",
-      getItemLite("hair_long_tied_test").unwrapOr(null),
+      catalog.getItemLite("hair_long_tied_test").unwrapOr(null),
     );
 
     expect(selectedColors).to.deep.equal({});
@@ -370,7 +371,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("heads_human_male", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "heads_human_male",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ head: "light", eyes: "green" });
   });
@@ -392,7 +397,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("heads_human_male", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "heads_human_male",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ head: "bronze", eyes: "lpcr.black" });
   });
@@ -415,7 +424,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("heads_human_male", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "heads_human_male",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ head: "light", eyes: "lpcr.black" });
   });
@@ -433,7 +446,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("heads_human_male", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "heads_human_male",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ head: "bronze" });
   });
@@ -446,7 +463,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("shoulders_legion", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "shoulders_legion",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ shoulders: "all.lpcr.red" });
   });
@@ -459,7 +480,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("shoulders_legion", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "shoulders_legion",
+      state.selections,
+    );
 
     expect(recolors).to.deep.equal({ shoulders: "brass" });
   });
@@ -480,7 +505,11 @@ describe("state/palettes.ts", () => {
       },
     };
 
-    const recolors = getMultiRecolors("shoulders_epaulets", state.selections);
+    const recolors = getMultiRecolors(
+      catalog,
+      "shoulders_epaulets",
+      state.selections,
+    );
 
     expect(recolors).to.equal(null);
   });

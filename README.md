@@ -13,6 +13,10 @@ LPC Spritesheet Character Generator
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/README.md) [![zh](https://img.shields.io/badge/lang-zh-green.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/lang/zh/README_ZH.md)
 
+#### Badges
+
+[![codecov](https://codecov.io/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator/graph/badge.svg?branch=master)](https://codecov.io/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator)
+
 This generator attempts to include all [LPC](https://lpc.opengameart.org) created character art up to now.
 
 Try it [here](https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/).
@@ -83,6 +87,14 @@ If you don't want to _show_ the entire credits file directly, should include a s
 **For additional information on the licensing and attribution requirement, please refer here on [OpenGameArt.org](https://opengameart.org/content/faq#q-proprietary).**
 
 ### [Contributing](CONTRIBUTING.md) ⤴
+
+### Test coverage
+
+Unit-test line coverage is reported on [Codecov](https://codecov.io/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator) (free for this public repo). The [badge](https://codecov.io/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator) above tracks the default branch.
+
+Coverage comes from Node (`node:test`) and Testem/Mocha in Chrome and Firefox only. Playwright visual tests are **not** included; they stay on Argos.
+
+Pull requests fail if **new or edited production lines** are not executed by a unit test, or if **existing production lines lose coverage** (deleted or weakened unit tests). They do **not** fail because the overall coverage percentage moved. See [CONTRIBUTING.md](CONTRIBUTING.md#unit-test-coverage) for how to run reports locally and what the checks mean.
 
 ### Animation Frame Guide
 
@@ -162,7 +174,10 @@ If an engine is not listed above, try Google. However, it is very likely that yo
 
 #### Tooling
 
+Requires **Node.js 22.18+** (`package.json` `engines`; CI uses Node 24) so `node` can run first-party `.ts` files. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup.
+
 - **Lint:** `npm run lint`
+- **Type-check:** `npm run type-check`
 - **Format:** `npm run format:check` (verify) or `npm run format` (apply)
 - **Tests:** `npm test` (Node checks plus browser tests). Visual regression: `npm run test:visual`. Details are in [CONTRIBUTING.md](CONTRIBUTING.md).
 

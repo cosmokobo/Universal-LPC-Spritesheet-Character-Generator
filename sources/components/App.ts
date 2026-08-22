@@ -9,13 +9,7 @@ import { Credits } from "./download/Credits.ts";
 import { AdvancedTools } from "./advanced/AdvancedTools.ts";
 import { renderCharacter } from "../canvas/renderer.ts";
 
-/**
- * App is the composition root for catalog DI. main.ts mounts it with the
- * `defaultCatalog` instance; App threads catalog down to children that have
- * migrated to receive it via attrs. Children that still import from
- * `state/catalog.ts` directly are unaffected — they read the same
- * `defaultCatalog` state under the hood.
- */
+/** App threads the catalog owned by application bootstrap through the UI. */
 type AppAttrs = { catalog: CatalogReader };
 
 type AppState = {
@@ -49,7 +43,11 @@ export const App: m.Component<AppAttrs, AppState> = {
       syncSelectionsToHash(vnode.attrs.catalog);
       if (window.canvasRenderer) {
         // Render to offscreen canvas (async)
-        renderCharacter(state.selections, state.bodyType).then(() => {
+        renderCharacter(
+          vnode.attrs.catalog,
+          state.selections,
+          state.bodyType,
+        ).then(() => {
           // Trigger redraw to update preview canvas after offscreen render completes
           m.redraw();
         });

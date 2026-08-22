@@ -25,3 +25,5 @@ dotnet/**/bin/
 dotnet/**/obj/
 dotnet/.vs/
 dotnet/.idea/
+/coverage/
+/.nyc_output/

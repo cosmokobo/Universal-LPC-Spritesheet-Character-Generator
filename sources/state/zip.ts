@@ -4,7 +4,7 @@ import {
   FRAME_SIZE,
   DIRECTIONS,
 } from "./constants.ts";
-import { defaultCatalog, getItemMerged } from "./catalog.ts";
+import type { CatalogReader } from "./catalog.ts";
 import {
   extractAnimationFromCanvas,
   renderSingleItem,
@@ -68,6 +68,7 @@ type ExportSplitAnimationsDeps = {
 
 // Export ZIP - Split by animation
 export const exportSplitAnimations = async (
+  catalog: CatalogReader,
   deps: Partial<ExportSplitAnimationsDeps> = {},
 ): Promise<void> => {
   const baseAddAnimationSliceToZip =
@@ -176,7 +177,7 @@ export const exportSplitAnimations = async (
 
     await profiler.phase("staticFiles", async () => {
       addCharacterJsonAndCredits(
-        defaultCatalog,
+        catalog,
         zip,
         creditsFolder,
         state!,
@@ -232,6 +233,7 @@ type ExportSplitItemSheetsDeps = {
 
 // Export ZIP - Split by item
 export const exportSplitItemSheets = async (
+  catalog: CatalogReader,
   deps: Partial<ExportSplitItemSheetsDeps> = {},
 ): Promise<void> => {
   const baseAddCanvasToZip = deps.addCanvasToZip ?? addCanvasToZip;
@@ -265,16 +267,17 @@ export const exportSplitItemSheets = async (
     for (const [, selection] of Object.entries(state.selections)) {
       const { itemId, variant, name } = selection;
       const itemLayers = getSortedLayersWithCustomFallback(
-        defaultCatalog,
+        catalog,
         itemId,
       ).unwrapOr([]);
 
       // Get Multiple Recolors If Available
-      const recolors = getMultiRecolors(itemId, state.selections);
+      const recolors = getMultiRecolors(catalog, itemId, state.selections);
 
       // Render each layer of the item separately
       for (const layer of itemLayers) {
         const fileName = getItemFileName(
+          catalog,
           itemId,
           String(variant),
           name,
@@ -282,6 +285,7 @@ export const exportSplitItemSheets = async (
         );
         try {
           const itemCanvas = await renderSingleItemFn(
+            catalog,
             itemId,
             variant ?? null,
             recolors,
@@ -305,7 +309,7 @@ export const exportSplitItemSheets = async (
 
     await profiler.phase("staticFiles", async () => {
       addCharacterJsonAndCredits(
-        defaultCatalog,
+        catalog,
         zip,
         creditsFolder,
         state!,
@@ -351,6 +355,7 @@ type ExportSplitItemAnimationsDeps = {
 
 // Export ZIP - Split by animation and item
 export const exportSplitItemAnimations = async (
+  catalog: CatalogReader,
   deps: Partial<ExportSplitItemAnimationsDeps> = {},
 ): Promise<void> => {
   const baseAddAnimationSliceToZip =
@@ -422,7 +427,7 @@ export const exportSplitItemAnimations = async (
       // Export each item for this animation
       for (const [, selection] of Object.entries(state.selections)) {
         const { itemId, variant, name } = selection;
-        const metaResult = getItemMerged(itemId);
+        const metaResult = catalog.getItemMerged(itemId);
         if (
           metaResult.isErr() ||
           !metaResult.value.animations.includes(anim.value)
@@ -437,14 +442,15 @@ export const exportSplitItemAnimations = async (
         }
 
         // Get Multiple Recolors If Available
-        const recolors = getMultiRecolors(itemId, state.selections);
+        const recolors = getMultiRecolors(catalog, itemId, state.selections);
 
         const itemLayers = getSortedLayersWithCustomFallback(
-          defaultCatalog,
+          catalog,
           itemId,
         ).unwrapOr([]);
         for (const layer of itemLayers) {
           const fileName = getItemFileName(
+            catalog,
             itemId,
             String(variant),
             name,
@@ -453,6 +459,7 @@ export const exportSplitItemAnimations = async (
 
           try {
             const animCanvas = await renderSingleItemAnimationFn(
+              catalog,
               itemId,
               variant ?? null,
               recolors,
@@ -488,6 +495,7 @@ export const exportSplitItemAnimations = async (
 
         const spritePath = layer.spritePath;
         const itemFileName = getItemFileName(
+          catalog,
           layer.itemId,
           String(layer.variant),
           layer.name ?? "",
@@ -516,6 +524,7 @@ export const exportSplitItemAnimations = async (
             "render_composite_customItemSprite",
             async () => {
               imgCanvas = await getImageToDrawFn(
+                catalog,
                 img!,
                 layer.itemId,
                 layer.recolors,
@@ -568,7 +577,7 @@ export const exportSplitItemAnimations = async (
 
     await profiler.phase("staticFiles", async () => {
       addCharacterJsonAndCredits(
-        defaultCatalog,
+        catalog,
         zip,
         creditsFolder,
         state!,
@@ -649,6 +658,7 @@ type BlobTaskResult = BlobTask & {
 
 // Export ZIP - Individual animation frames
 export const exportIndividualFrames = async (
+  catalog: CatalogReader,
   deps: Partial<ExportIndividualFramesDeps> = {},
 ): Promise<void> => {
   const extractAnimationFromCanvasFn =
@@ -880,7 +890,7 @@ export const exportIndividualFrames = async (
 
     await profiler.phase("staticFiles", async () => {
       addCharacterJsonAndCredits(
-        defaultCatalog,
+        catalog,
         zip,
         creditsFolder,
         state!,

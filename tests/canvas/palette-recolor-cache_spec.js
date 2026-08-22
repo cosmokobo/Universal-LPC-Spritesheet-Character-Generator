@@ -15,10 +15,41 @@ import {
   getImageToDraw,
   clearRecolorCache,
 } from "../../sources/canvas/palette-recolor.ts";
+import { createCatalog } from "../../sources/state/catalog.ts";
+import { seedCatalog } from "../browser-catalog-fixture.js";
 
-// Real item id from the dataset with a single recolor region.
-// `body` has type_name="body", recolors=[{material: "body"}].
 const RECOLOR_ITEM_ID = "body";
+
+const itemMetadata = {
+  [RECOLOR_ITEM_ID]: {
+    name: "Body",
+    type_name: "body",
+    recolors: [
+      {
+        material: "body",
+        default: "ulpc",
+        base: "ulpc.light",
+      },
+    ],
+  },
+};
+
+const paletteMetadata = {
+  versions: {},
+  materials: {
+    body: {
+      default: "ulpc",
+      base: "light",
+      palettes: {
+        ulpc: {
+          light: ["#FF0000"],
+          olive: ["#00FF00"],
+          bronze: ["#0000FF"],
+        },
+      },
+    },
+  },
+};
 
 function solidColorCanvas(r, g, b, w = 8, h = 8) {
   const c = document.createElement("canvas");
@@ -31,7 +62,11 @@ function solidColorCanvas(r, g, b, w = 8, h = 8) {
 }
 
 describe("canvas/palette-recolor.ts recolor cache", () => {
+  let catalog;
+
   beforeEach(() => {
+    catalog = createCatalog();
+    seedCatalog(catalog, itemMetadata, { paletteMetadata });
     clearRecolorCache();
   });
 
@@ -40,8 +75,20 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const recolors = { body: "olive" };
     const path = "spritesheets/body/bodies/male/walk.png";
 
-    const first = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path);
-    const second = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path);
+    const first = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      path,
+    );
+    const second = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      path,
+    );
 
     expect(first).to.equal(second);
   });
@@ -51,12 +98,14 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const path = "spritesheets/body/bodies/male/walk.png";
 
     const olive = await getImageToDraw(
+      catalog,
       img,
       RECOLOR_ITEM_ID,
       { body: "olive" },
       path,
     );
     const bronze = await getImageToDraw(
+      catalog,
       img,
       RECOLOR_ITEM_ID,
       { body: "bronze" },
@@ -71,12 +120,14 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const recolors = { body: "olive" };
 
     const a = await getImageToDraw(
+      catalog,
       img,
       RECOLOR_ITEM_ID,
       recolors,
       "spritesheets/body/bodies/male/walk.png",
     );
     const b = await getImageToDraw(
+      catalog,
       img,
       RECOLOR_ITEM_ID,
       recolors,
@@ -90,8 +141,20 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const img = solidColorCanvas(255, 0, 0);
     const recolors = { body: "olive" };
 
-    const first = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, null);
-    const second = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, null);
+    const first = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      null,
+    );
+    const second = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      null,
+    );
 
     expect(first).to.not.equal(second);
   });
@@ -100,7 +163,13 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const img = solidColorCanvas(255, 0, 0);
     const path = "spritesheets/body/bodies/male/walk.png";
 
-    const result = await getImageToDraw(img, RECOLOR_ITEM_ID, null, path);
+    const result = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      null,
+      path,
+    );
 
     expect(result).to.equal(img);
   });
@@ -110,9 +179,21 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const recolors = { body: "olive" };
     const path = "spritesheets/body/bodies/male/walk.png";
 
-    const first = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path);
+    const first = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      path,
+    );
     clearRecolorCache();
-    const second = await getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path);
+    const second = await getImageToDraw(
+      catalog,
+      img,
+      RECOLOR_ITEM_ID,
+      recolors,
+      path,
+    );
 
     expect(first).to.not.equal(second);
   });
@@ -123,9 +204,9 @@ describe("canvas/palette-recolor.ts recolor cache", () => {
     const path = "spritesheets/body/bodies/male/walk.png";
 
     const [a, b, c] = await Promise.all([
-      getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path),
-      getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path),
-      getImageToDraw(img, RECOLOR_ITEM_ID, recolors, path),
+      getImageToDraw(catalog, img, RECOLOR_ITEM_ID, recolors, path),
+      getImageToDraw(catalog, img, RECOLOR_ITEM_ID, recolors, path),
+      getImageToDraw(catalog, img, RECOLOR_ITEM_ID, recolors, path),
     ]);
 
     expect(a).to.equal(b);

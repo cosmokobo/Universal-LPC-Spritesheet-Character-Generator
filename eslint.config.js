@@ -1,12 +1,10 @@
 /* Run: npm i && npx eslint . (or enable ESLint in your IDE) */
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import babelParser from "@babel/eslint-parser";
 import globals from "globals";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 const sharedParserOptions = {
-  requireConfigFile: false,
   ecmaVersion: "latest",
 };
 
@@ -55,6 +53,8 @@ export default [
       "tests/fixtures/**",
       "tmp/**",
       "spritesheets/**",
+      "/coverage/**",
+      "/.nyc_output/**",
     ],
   },
   js.configs.recommended,
@@ -68,7 +68,6 @@ export default [
   {
     files: ["**/*.js"],
     languageOptions: {
-      parser: babelParser,
       parserOptions: {
         ...sharedParserOptions,
         sourceType: "module",
@@ -104,6 +103,16 @@ export default [
     rules: commonRulesTs,
   },
   {
+    files: ["scripts/**/*.ts", "vite/**/*.ts", "vite.config.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
+      },
+    },
+    rules: commonRulesTs,
+  },
+  {
     files: ["tests/**/*.js"],
     ignores: ["tests/visual/**"],
     languageOptions: {
@@ -121,13 +130,23 @@ export default [
   },
   {
     files: ["tests/**/*.ts"],
-    ignores: ["tests/visual/**"],
+    ignores: ["tests/visual/**", "tests/node/**"],
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.es2021,
         ...globals.mocha,
         m: "readonly",
+      },
+    },
+    rules: commonRulesTs,
+  },
+  {
+    files: ["tests/node/**/*.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
       },
     },
     rules: commonRulesTs,
@@ -147,23 +166,8 @@ export default [
     },
   },
   {
-    files: ["playwright.config.js", "vite.config.js", "vite/**/*.js"],
-    languageOptions: {
-      parser: babelParser,
-      parserOptions: {
-        ...sharedParserOptions,
-        sourceType: "module",
-      },
-      globals: {
-        ...globals.node,
-        ...globals.es2021,
-      },
-    },
-  },
-  {
     files: ["**/*.cjs"],
     languageOptions: {
-      parser: babelParser,
       parserOptions: {
         ...sharedParserOptions,
         sourceType: "commonjs",
