@@ -1,6 +1,14 @@
 LPC Spritesheet Character Generator
 =============================================
 
+> **⚠ This is a custom fork** — [kojeomstudio/Universal-LPC-Spritesheet-Character-Generator](https://github.com/kojeomstudio/Universal-LPC-Spritesheet-Character-Generator)
+>
+> **Upstream (main stream)**: https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator.git
+>
+> Custom additions: C#/.NET 8 port (`dotnet/`), LoRA training dataset pipeline, build output
+> standardization. Sync with upstream: `git fetch upstream && git merge upstream/master`.
+
+
 #### Translations
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/README.md) [![zh](https://img.shields.io/badge/lang-zh-green.svg)](https://github.com/liberatedpixelcup/Universal-LPC-Spritesheet-Character-Generator/blob/master/lang/zh/README_ZH.md)
