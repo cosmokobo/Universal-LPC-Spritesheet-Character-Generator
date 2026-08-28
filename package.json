@@ -101,7 +101,7 @@
     }
   },
   "build": {
-    "appId": "com.kojeomstudio.lpc-sprite-generator",
+    "appId": "com.cosmokobo.lpc-sprite-generator",
     "productName": "LPC Sprite Generator",
     "compression": "maximum",
     "directories": {
