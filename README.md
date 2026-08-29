@@ -1,7 +1,7 @@
 LPC Spritesheet Character Generator
 =============================================
 
-> **⚠ This is a custom fork** — [kojeomstudio/Universal-LPC-Spritesheet-Character-Generator](https://github.com/kojeomstudio/Universal-LPC-Spritesheet-Character-Generator)
+> **⚠ This is a custom fork** — [cosmokobo/Universal-LPC-Spritesheet-Character-Generator](https://github.com/cosmokobo/Universal-LPC-Spritesheet-Character-Generator)
 >
 > **Upstream (main stream)**: https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator.git
 >
