@@ -27,6 +27,8 @@ public class RendererSmokeTests
 
     private static string FindRepoRoot()
     {
+        // 테스트 bin이 서브모듈 안(로컬 빌드) 또는 build/lpc-sprite-generator/(
+        // dotnet/Directory.Build.props 출력 리다이렉트)에 있을 수 있다.
         var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
         while (dir != null)
         {
@@ -35,7 +37,16 @@ public class RendererSmokeTests
                 return dir.FullName;
             dir = dir.Parent;
         }
-        return "/c/workspaces/business/tools/lpc-sprite-generator";
+        var ws = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (ws != null)
+        {
+            string lpc = Path.Combine(ws.FullName, "tools", "lpc-sprite-generator");
+            if (Directory.Exists(Path.Combine(lpc, "sheet_definitions")))
+                return lpc;
+            ws = ws.Parent;
+        }
+        throw new InvalidOperationException(
+            "LPC 리포 루트(sheet_definitions)를 찾지 못함 — 서브모듈 체크아웃이 포함된 워크스페이스에서 실행하세요.");
     }
 
     private static string FindWorkspaceRoot()

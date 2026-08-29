@@ -27,7 +27,16 @@ public class RandomGeneratorTests
                 return dir.FullName;
             dir = dir.Parent;
         }
-        return "/c/workspaces/business/tools/lpc-sprite-generator";
+        var ws = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (ws != null)
+        {
+            string lpc = Path.Combine(ws.FullName, "tools", "lpc-sprite-generator");
+            if (Directory.Exists(Path.Combine(lpc, "sheet_definitions")))
+                return lpc;
+            ws = ws.Parent;
+        }
+        throw new InvalidOperationException(
+            "LPC 리포 루트(sheet_definitions)를 찾지 못함 — 서브모듈 체크아웃이 포함된 워크스페이스에서 실행하세요.");
     }
 
     [Fact]
