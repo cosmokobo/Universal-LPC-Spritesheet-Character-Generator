@@ -59,7 +59,16 @@ public class RendererSmokeTests
                 return dir.FullName;
             dir = dir.Parent;
         }
-        return "/c/workspaces/business";
+        // 빌드 출력 리다이렉트 환경 폴백 — 엔진 디렉토리를 보유한 조상에서 유추.
+        var probe = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (probe != null)
+        {
+            if (Directory.Exists(Path.Combine(probe.FullName, "engines")))
+                return probe.FullName;
+            probe = probe.Parent;
+        }
+        throw new InvalidOperationException(
+            "워크스페이스 루트(engines/)를 찾지 못함 — 서브모듈 체크아웃이 포함된 워크스페이스에서 실행하세요.");
     }
 
     private static LpcCatalog LoadCatalog() => new LpcCatalog(new CatalogLoader(
